@@ -4,11 +4,45 @@ from tkinter import *
 class App(Frame):
 
     def __init__(self, master=None):
+        """App constructor
+
+        Initialize main gui frame and setup virp components.
+        virp = voltage current resistance power.
+        """
         super().__init__(master)
+        self.virp_dict = {}
+        self.virp_labels = ('Voltage (V)', 'Current (I)', 'Resistance (R)', 'Power (P)')
+        self.virp_entries = {label: Entry(self) for label in self.virp_labels}
+        self.create_calculator()
         self.pack()
+
+    def create_calculator(self):
+        """Create calculator module.
+
+        Create Entry components with corresponding Label from list
+        of labels and retrieve user input. Send a dict of user input
+        values to Calculator to calculate ohms and kirchoffs laws.
+        """
+        for k, v in dict(enumerate(self.virp_labels, start=1)).items():
+            Label(self, text=v, padx=5, pady=5).grid(row=k)
+            self.virp_entries[v].grid(row=k, column=1)
+
+        Button(self, text='Calculate',
+            command=self.calculate
+        ).grid(row=len(self.virp_labels)+1, column=1)
+
+    def calculate(self):
+        """Calculate equations.
+
+        Calculate virp values given user input.
+        """
+        self.virp_dict = {
+            label: self.virp_entries[label].get() for label in self.virp_labels
+        }
 
     def quit(self):
         root.destroy()
+
 
 if __name__ == '__main__':
     root = Tk()
