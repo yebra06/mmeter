@@ -13,6 +13,7 @@ Instructions
 To run gui application::
 
   $ git clone https://github.com/yebra06/mmeter.git
+  $ cd mmeter
   $ make
 
 *******
