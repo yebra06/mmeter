@@ -1,17 +1,18 @@
-import unittest
+from unittest import TestCase
+
+from mmeter.mmeter import App
 
 
-class TestSanity(unittest.TestCase):
+class TestAppInstance(TestCase):
 
 	def setUp(self):
-		self.one = 1
+		self.app = App()
 
 	def tearDown(self):
-		pass
+		self.app.destroy()
 
-	def test_sanity(self):
-		self.assertEqual(1, self.one)
-		self.assertEqual('foo'.upper(), 'FOO')
+	def test_instance(self):
+		self.assertIsInstance(self.app, App)
 
 
 if __name__ == '__main__':
