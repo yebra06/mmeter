@@ -13,11 +13,27 @@ class App(Frame):
         self.virp_dict = {}
         self.virp_labels = ('Voltage (V)', 'Current (I)', 'Resistance (R)', 'Power (P)')
         self.virp_entries = {label: Entry(self) for label in self.virp_labels}
+        self.create_menu()
         self.create_calculator()
         self.pack()
 
+    def create_menu(self):
+        """Create main menu
+
+        Using Menu component, create a main menu bar and add
+        Button components to each Menu.
+        """
+        main_menu = Menu(self.master)
+        self.master.config(menu=main_menu)
+
+        # Create file menu bar option.
+        file = Menu(main_menu)
+        file.add_command(label='Exit', command=self.quit)
+        main_menu.add_cascade(label='File', menu=file)
+        Button(self, text='Quit', command=self.quit)
+
     def create_calculator(self):
-        """Create calculator module.
+        """Create calculator module
 
         Create Entry components with corresponding Label from list
         of labels and retrieve user input. Send a dict of user input
@@ -27,6 +43,7 @@ class App(Frame):
             Label(self, text=v, padx=5, pady=5).grid(row=k)
             self.virp_entries[v].grid(row=k, column=1)
 
+        # Button to calculate given entries.
         Button(self, text='Calculate',
             command=self.calculate
         ).grid(row=len(self.virp_labels)+1, column=1)
