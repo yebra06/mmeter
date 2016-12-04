@@ -3,7 +3,7 @@ from tkinter import *
 
 class App(Frame):
 
-    def __init__(self, master):
+    def __init__(self, master=None):
         """App constructor
 
         Initialize main gui frame and setup virp components.
