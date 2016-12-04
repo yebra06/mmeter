@@ -3,14 +3,13 @@ from tkinter import *
 
 class App(Frame):
 
-    def __init__(self, master=None):
+    def __init__(self, master):
         """App constructor
 
         Initialize main gui frame and setup virp components.
         virp = voltage current resistance power.
         """
         super().__init__(master)
-        self.virp_dict = {}
         self.virp_labels = ('Voltage (V)', 'Current (I)', 'Resistance (R)', 'Power (P)')
         self.virp_entries = {label: Entry(self) for label in self.virp_labels}
         self.create_menu()
@@ -32,6 +31,10 @@ class App(Frame):
         main_menu.add_cascade(label='File', menu=file)
         Button(self, text='Quit', command=self.quit)
 
+        # Create edit option.
+        edit = Menu(main_menu)
+        main_menu.add_cascade(label='Edit', menu=edit)
+
     def create_calculator(self):
         """Create calculator module
 
@@ -49,13 +52,10 @@ class App(Frame):
         ).grid(row=len(self.virp_labels)+1, column=1)
 
     def calculate(self):
-        """Calculate equations.
-
-        Calculate virp values given user input.
-        """
-        self.virp_dict = {
-            label: self.virp_entries[label].get() for label in self.virp_labels
-        }
+        """Calculate equations."""
+        v, i, r, p = (
+            self.virp_entries[lab].get() for lab in self.virp_labels
+        )
 
     def quit(self):
         root.destroy()
