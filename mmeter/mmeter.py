@@ -57,6 +57,37 @@ class App(Frame):
             self.virp_entries[lab].get() for lab in self.virp_labels
         )
 
+        if v and i:
+            p = int(v) * int(i)
+            r = int(v) / int(i)
+        elif v and r:
+            p = int(v)**2 / int(r)
+            i = int(v) / int(r)
+        elif v and p:
+            i = int(p) / int(v)
+            r = int(v) / int(i)
+        elif i and r:
+            v = int(i) * int(r)
+            p = int(i) * int(v)
+        elif i and p:
+            v = int(p) / int(i)
+            r = int(v) / int(i)
+        elif r and p:
+            v = int(i) * int(r)
+            i = int(v) / int(r)
+        else:
+            self.error_label = Label(self, text='Error: Please enter at least 2 values').grid(row=0, column=0)
+
+        self.virp_entries['Voltage (V)'].delete(0, END)
+        self.virp_entries['Current (I)'].delete(0, END)
+        self.virp_entries['Resistance (R)'].delete(0, END)
+        self.virp_entries['Power (P)'].delete(0, END)
+
+        self.virp_entries['Voltage (V)'].insert(0, str(v))
+        self.virp_entries['Current (I)'].insert(0, str(i))
+        self.virp_entries['Resistance (R)'].insert(0, str(r))
+        self.virp_entries['Power (P)'].insert(0, str(p))
+
     def quit(self):
         root.destroy()
 
