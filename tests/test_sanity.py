@@ -1,3 +1,4 @@
+from tkinter import Tk
 from unittest import TestCase
 
 from mmeter.mmeter import App
@@ -6,7 +7,8 @@ from mmeter.mmeter import App
 class TestAppInstance(TestCase):
 
 	def setUp(self):
-		self.app = App()
+		self.root = Tk()
+		self.app = App(self.root)
 
 	def tearDown(self):
 		self.app.destroy()
