@@ -52,7 +52,9 @@ class App(Frame):
         ).grid(row=len(self.virp_labels)+1, column=1)
 
     def calculate(self):
-        """Calculate equations."""
+        """
+        Calculate equations.
+        """
         v, i, r, p = (
             self.virp_entries[lab].get() for lab in self.virp_labels
         )
@@ -76,7 +78,9 @@ class App(Frame):
             v = int(i) * int(r)
             i = int(v) / int(r)
         else:
-            self.error_label = Label(self, text='Error: Please enter at least 2 values').grid(row=0, column=0)
+            Label(
+                self, text='Please enter at least 2 values', pady=5,
+            ).grid(row=0)
 
         self.virp_entries['Voltage (V)'].delete(0, END)
         self.virp_entries['Current (I)'].delete(0, END)
@@ -95,6 +99,5 @@ class App(Frame):
 if __name__ == '__main__':
     root = Tk()
     root.title('MMeter')
-    root.geometry('500x500')
     app = App(master=root)
     app.mainloop()
