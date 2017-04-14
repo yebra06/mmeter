@@ -1,103 +1,124 @@
-from tkinter import *
+#!/usr/bin/python3
+
+import tkinter as tk
+from tkinter import ttk
 
 
-class App(Frame):
+class App(tk.Frame):
 
-    def __init__(self, master=None):
+    def __init__(self, parent):
         """App constructor
 
         Initialize main gui frame and setup virp components.
-        virp = voltage current resistance power.
+        virp: voltage current resistance power
         """
-        super().__init__(master)
+        tk.Frame.__init__(self, parent)
+        self.root = parent
+        self.root.title('MMeter')
+        self.init_gui()
+
+    def init_gui(self):
+        """Initialize widgets
+
+        Set up gui widgets onto grid layout.
+        """
+        self.grid(column=0, row=0, sticky='nsew')
+
+        # Error to be shown when user submits form with missing inputs.
+        self.missing_input_err = tk.StringVar()
+        self.error_missing_input_label = tk.Label(self, text='', anchor=tk.CENTER,
+            textvariable=self.missing_input_err).grid(row=0, columnspan=2)
+
+        # Create labels and place them on the grid.
         self.virp_labels = ('Voltage (V)', 'Current (I)', 'Resistance (R)', 'Power (P)')
-        self.virp_entries = {label: Entry(self) for label in self.virp_labels}
-        self.create_menu()
-        self.create_calculator()
-        self.pack()
-
-    def create_menu(self):
-        """Create main menu
-
-        Using Menu component, create a main menu bar and add
-        Button components to each Menu.
-        """
-        main_menu = Menu(self.master)
-        self.master.config(menu=main_menu)
-
-        # Create file menu bar option.
-        file = Menu(main_menu)
-        file.add_command(label='Exit', command=self.quit)
-        main_menu.add_cascade(label='File', menu=file)
-        Button(self, text='Quit', command=self.quit)
-
-        # Create edit option.
-        edit = Menu(main_menu)
-        main_menu.add_cascade(label='Edit', menu=edit)
-
-    def create_calculator(self):
-        """Create calculator module
-
-        Create Entry components with corresponding Label from list
-        of labels and retrieve user input. Send a dict of user input
-        values to Calculator to calculate ohms and kirchoffs laws.
-        """
+        self.virp_entries = {label: tk.Entry(self) for label in self.virp_labels}
         for k, v in dict(enumerate(self.virp_labels, start=1)).items():
-            Label(self, text=v, padx=5, pady=5).grid(row=k)
-            self.virp_entries[v].grid(row=k, column=1)
+            tk.Label(self, text=v).grid(row=k+1)
+            self.virp_entries[v].grid(row=k+1, column=1)
 
-        # Button to calculate given entries.
-        Button(self, text='Calculate',
-            command=self.calculate
-        ).grid(row=len(self.virp_labels)+1, column=1)
+        # Calculate virp values from form entries.
+        self.calc_btn = tk.Button(self, text='Calculate',
+            command=self.calculate).grid(row=len(self.virp_labels)+2, column=0)
+
+        # Clear form button.
+        self.clear_btn = tk.Button(self, text='Clear',
+            command=self.clear_form).grid(row=len(self.virp_labels)+2, column=1)
 
     def calculate(self):
-        """
-        Calculate equations.
-        """
-        v, i, r, p = (
-            self.virp_entries[lab].get() for lab in self.virp_labels
-        )
+        """Calculate equations from virp entries.
 
+        Calculate given inputs and display errors if any. An error will occur
+        if the user doesn't provide more than 1 values for Ohms law.
+        """
+        mul = lambda x, y: float(x) * float(y)
+        div = lambda x, y: float(x) / float(y)
+
+        # Get input values
+        v, i, r, p = (self.virp_entries[lab].get() for lab in self.virp_labels)
+
+        # Count number of form entries.
+        input_counter = 0
+
+        # Note: In python3, division is converted to float automagically.
         if v and i:
-            p = int(v) * int(i)
-            r = int(v) / int(i)
+            p = mul(v, i)
+            r = div(v, i)
+            input_counter += 1
         elif v and r:
-            p = int(v)**2 / int(r)
-            i = int(v) / int(r)
+            p = div(float(v)**2, r)
+            i = div(v, r)
+            input_counter += 1
         elif v and p:
-            i = int(p) / int(v)
-            r = int(v) / int(i)
+            i = div(p, v)
+            r = div(v, i)
+            input_counter += 1
         elif i and r:
-            v = int(i) * int(r)
-            p = int(i) * int(v)
+            v = mul(i, r)
+            p = mul(i, v)
+            input_counter += 1
         elif i and p:
-            v = int(p) / int(i)
-            r = int(v) / int(i)
+            v = div(p, i)
+            r = div(v, i)
+            input_counter += 1
         elif r and p:
-            v = int(i) * int(r)
-            i = int(v) / int(r)
+            v = mul(i, r)
+            i = div(i, r)
+            input_counter += 1
         else:
-            Label(
-                self, text='Please enter at least 2 values', pady=5,
-            ).grid(row=0)
+            if input_counter > 1:
+                self.missing_input_err.set('')
+            else:
+                self.missing_input_err.set('Please provide at least 2 values.')
 
-        self.virp_entries['Voltage (V)'].delete(0, END)
-        self.virp_entries['Current (I)'].delete(0, END)
-        self.virp_entries['Resistance (R)'].delete(0, END)
-        self.virp_entries['Power (P)'].delete(0, END)
+        self.update_form(v, i, r, p)
 
-        self.virp_entries['Voltage (V)'].insert(0, str(v))
-        self.virp_entries['Current (I)'].insert(0, str(i))
-        self.virp_entries['Resistance (R)'].insert(0, str(r))
-        self.virp_entries['Power (P)'].insert(0, str(p))
+    def update_form(self, v, i, r, p):
+        """Update form
 
-    def quit(self):
-        root.destroy()
+        Update form values based on user inputs. First, the existing entries
+        are deleted and then updated.
+        """
+        self.virp_entries['Voltage (V)'].delete(0, tk.END)
+        self.virp_entries['Voltage (V)'].insert(0, float(v))
+        self.virp_entries['Current (I)'].delete(0, tk.END)
+        self.virp_entries['Current (I)'].insert(0, float(i))
+        self.virp_entries['Resistance (R)'].delete(0, tk.END)
+        self.virp_entries['Resistance (R)'].insert(0, float(r))
+        self.virp_entries['Power (P)'].delete(0, tk.END)
+        self.virp_entries['Power (P)'].insert(0, float(p))
+
+    def clear_form(self):
+        """Clear form data
+
+        Delete all existing entries in the form.
+        """
+        self.virp_entries['Voltage (V)'].delete(0, tk.END)
+        self.virp_entries['Current (I)'].delete(0, tk.END)
+        self.virp_entries['Resistance (R)'].delete(0, tk.END)
+        self.virp_entries['Power (P)'].delete(0, tk.END)
 
 
 if __name__ == '__main__':
-    root = Tk()
-    root.title('MMeter')
-    app = App(master=root)
-    app.mainloop()
+    root = tk.Tk()
+    App(root)
+    root.mainloop()
